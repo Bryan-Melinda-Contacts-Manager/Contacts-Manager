@@ -31,10 +31,12 @@ public class ContactsManager {
         Contact user1 = new Contact("bryan", "2034825751");
         Contact user2 = new Contact("eduardo","2103949062");
         Contact user3 = new Contact("andrew", "6949095454");
+        Contact user4 = new Contact("melinda", "2107659832");
 
         contactsObjects.add(user1);
         contactsObjects.add(user2);
         contactsObjects.add(user3);
+        contactsObjects.add(user4);
         //if dir/file does not exist, create it... if unable - throw exception
         if (!Files.exists(path)) {
             try {
@@ -85,10 +87,10 @@ public class ContactsManager {
         contactsObjects.add(newContact);
 //        contacts.add(contactInfo);
 
-        String contactInfo = name + " | " + telephone;
+        String contactInfo = name + "-" + telephone;
 
         try {
-                Files.write(path, Arrays.asList(contactInfo), StandardOpenOption.APPEND);
+            Files.write(path, Arrays.asList(contactInfo), StandardOpenOption.APPEND);
 //            Files.write(path, contacts);
 //            Files.write(path, instructors, StandardOpenOption.APPEND);
         } catch (IOException e) {
@@ -107,7 +109,7 @@ public class ContactsManager {
         String searchQuerey = scan.nextLine();
         for (Contact contact : contactsObjects) {
             if (searchQuerey.equalsIgnoreCase(contact.getName()) || searchQuerey.equals(contact.getTelephone())) {
-               result = contact.getName() + " | " + contact.getTelephone();
+               result = contact.getName() + "-" + contact.getTelephone();
                 break;
             } else {
                 result = "sorry, that contact does not exist";
@@ -117,55 +119,60 @@ public class ContactsManager {
     }
 
     //DELETE A CONTACT
-//    string list = contacts
-//    objectlist = contactObjects
-    public static void deleteContact() {
-        List<Contact> tempList = new ArrayList<>();
-        System.out.println("What is the name of the contact you'd like to delete?");
-        String searchQuery = scan.nextLine();
 
-        for(Contact contact : contactsObjects){
-            if(searchQuery.equalsIgnoreCase(contact.getName()) || searchQuery.equals(contact.getTelephone())){
-                continue;
-            }  else {
-                tempList.add(contact);
+    public static void deleteContact(){
+        boolean isThere = true;
+        System.out.println("Enter the name to delete:");
+        String nameDelete = scan.nextLine();
+        List<String> tempList = new ArrayList<>();
+        int counter = 0;
+        try{
+            for(String line : Files.readAllLines(path)){
+                String[] eachLine = line.split("-");
+                if(eachLine[0].equalsIgnoreCase(nameDelete)){
+                    counter++;
+                }
+                //editList.add(line);
             }
-        }
 
+            if(counter == 1){
+                for(String line : Files.readAllLines(path)){
+                    String[] eachLine = line.split("-");
+                    if(eachLine[0].equalsIgnoreCase(nameDelete)){
+                        continue;
+                    }
+                    tempList.add(line);
+                }
+            }else if(counter > 1){
+                System.out.println("There were multiple entries with the same name.");
+                System.out.println("Please enter a phone number to delete:");
+                String phoneDelete = scan.nextLine();
+//                boolean isThere = checkPhone(phoneDelete); // what does this do>?
 
+                if(isThere){
+                    for(String line : Files.readAllLines(path)){
+                        String[] eachLine = line.split("-");
+                        if(eachLine[1].equalsIgnoreCase(phoneDelete)){
+                            continue;
+                        }
+                        tempList.add(line);
+                    }
+                }else{
+                    System.out.println("Contact not in file.");
+                }
 
+            }
+            if(tempList.size() > 1){
+                Files.write(path, tempList);
+            }
 
-//        try {
-//            Files.write(path, "", StandardOpenOption.APPEND);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        try {
-           Formatter f = new Formatter((String.valueOf(path)));
-           f.format("");
-        } catch (FileNotFoundException e) {
+        }catch (Exception e){
             e.printStackTrace();
         }
 
-
-        try {
-            for(Contact contact : tempList){
-                String contactInfo = contact.getName() + " | " + contact.getTelephone();
-                Files.write(path, Arrays.asList(contactInfo), StandardOpenOption.APPEND);
-            }
-//            Files.write(path, contacts);
-//            Files.write(path, instructors, StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-//        contactsObjects = tempList;
 
     }
+
 
     //    string list = contacts
 //    objectlist = contactObjects
@@ -173,7 +180,7 @@ public class ContactsManager {
         //        write to file, if unable, throw exception
         try {
             for(Contact contact : contactsObjects){
-                String contactInfo = contact.getName() + " | " + contact.getTelephone();
+                String contactInfo = contact.getName() + "-" + contact.getTelephone();
                 Files.write(path, Arrays.asList(contactInfo), StandardOpenOption.APPEND);
             }
 //            Files.write(path, contacts);
@@ -187,6 +194,8 @@ public class ContactsManager {
     public static void main(String[] args) {
          boolean wantsToContinue = true;
         init();
+
+
 
 
 //        *************************************
